@@ -60,13 +60,22 @@ contract KadyrovToken is AccessControl {
         return _allowances[_owner][_spender];
     }
 
-    // function mint(address to, uint256 amount) public {
-    //     require(hasRole(MINTER_ROLE, msg.sender), "Caller is not a minter");
-    //     // _mint(to, amount);
-    // }
+    function mint(address _account, uint256 _amount) public returns (bool success) {
+        require(hasRole(MINTER_ROLE, msg.sender), "Caller is not a minter"); // requirements from erc20 openzeppeling doc
+        require(_account != address(0), "_to address can't be zero address");
+        _balances[_account] += _amount;
+        totalSupply += _amount;
+        emit Transfer(address(0), _account, _amount);
+        return true;
+    }
 
-    // function burn(address from, uint256 amount) public {
-    //     require(hasRole(BURNER_ROLE, msg.sender), "Caller is not a burner");
-    //     //_burn(from, amount);
-    // }
+    function burn(address _account, uint256 _amount) public returns (bool success) {
+        require(hasRole(BURNER_ROLE, msg.sender), "Caller is not a burner"); // requirements from erc20 openzeppeling doc
+        require(_account != address(0), "from address can't be zero address");
+        require(_balances[_account] >= _amount, "Account should have enough tokens");
+        _balances[_account] -= _amount;
+        totalSupply -= _amount;
+        emit Transfer(_account, address(0), _amount);
+        return true;
+    }
 }
