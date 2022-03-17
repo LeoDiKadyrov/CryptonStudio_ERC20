@@ -2,18 +2,26 @@
 pragma solidity ^0.8.0;
 
 import "hardhat/console.sol";
+import "@openzeppelin/contracts/access/AccessControl.sol";
 
-contract KadyrovToken {
+contract KadyrovToken is AccessControl {
     string public name = "KadyrovToken";
     string public symbol = "KDVT";
     uint8 public decimals = 18;
     uint256 public totalSupply;
+
+    bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
+    bytes32 public constant BURNER_ROLE = keccak256("BURNER_ROLE");
 
     mapping(address => uint256) public _balances;
     mapping(address => mapping(address => uint256)) public _allowances;
 
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _oldValue, uint256 _value); // ask about transfer with four arguments (is it override?)
+
+    constructor() {
+        _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
+    }
 
     function balanceOf(address _owner) public view returns (uint256 balance) {
         return _balances[_owner];
@@ -27,7 +35,7 @@ contract KadyrovToken {
         emit Transfer(msg.sender, _to, _value);
         return true;
     }
-    
+
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool success) {
         require(_to != address(0), "_to shouldn't be 0x0 address");
         require(_value < _balances[_from], "Not enough tokens on the balance to make transfer");
@@ -51,4 +59,14 @@ contract KadyrovToken {
     function allowance(address _owner, address _spender) public view returns (uint256 remaining) {
         return _allowances[_owner][_spender];
     }
+
+    // function mint(address to, uint256 amount) public {
+    //     require(hasRole(MINTER_ROLE, msg.sender), "Caller is not a minter");
+    //     // _mint(to, amount);
+    // }
+
+    // function burn(address from, uint256 amount) public {
+    //     require(hasRole(BURNER_ROLE, msg.sender), "Caller is not a burner");
+    //     //_burn(from, amount);
+    // }
 }
