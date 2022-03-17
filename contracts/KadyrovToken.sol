@@ -8,7 +8,7 @@ contract KadyrovToken is AccessControl {
     string public name = "KadyrovToken";
     string public symbol = "KDVT";
     uint8 public decimals = 18;
-    uint256 public totalSupply;
+    uint256 public totalSupply = 1000000000;
 
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
     bytes32 public constant BURNER_ROLE = keccak256("BURNER_ROLE");
@@ -21,6 +21,7 @@ contract KadyrovToken is AccessControl {
 
     constructor() {
         _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
+        _balances[msg.sender] = totalSupply;
     }
 
     function balanceOf(address _owner) public view returns (uint256 balance) {
