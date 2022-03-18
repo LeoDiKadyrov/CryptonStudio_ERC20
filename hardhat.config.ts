@@ -4,6 +4,7 @@ import '@nomiclabs/hardhat-waffle'
 import "@nomiclabs/hardhat-etherscan";
 import { task, HardhatUserConfig } from "hardhat/config";
 import 'dotenv/config'
+import "./tasks/index";
 
 task("accounts", "Prints the list of accounts", async (args, hre) => {
   const accounts = await hre.ethers.getSigners();
