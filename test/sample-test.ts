@@ -122,7 +122,7 @@ describe("Token", function () {
     });
   });
 
-  describe("approve", () => {
+  describe("Approve&Allowances", () => {
     it("Approve to zero address shouldn't work", async () => {
       expect(contract.approve(ethers.constants.AddressZero, 0, 10)).to.be.revertedWith("_spender cannot be the zero address");
     });
@@ -144,6 +144,56 @@ describe("Token", function () {
       await contract.approve(addr1.address, 0, 10);
       await contract.connect(addr1).transferFrom(owner.address, addr1.address, 5);
       expect(await contract.allowance(owner.address, addr1.address)).to.equal(5);
+    });
+  });
+
+  describe("Mint", () => {
+    it("Only minter can call function", async () => {
+      expect(contract.mint(addr1.address, 10)).to.be.revertedWith("Caller is not a minter");
+    });
+
+    it("Mint to zero address shouldn't work", async () => {
+      expect(contract.mint(ethers.constants.AddressZero, 10)).to.be.revertedWith("_to address can't be zero address")
+    });
+
+    it("Mint should emit Transfer event", async () => {
+      expect(contract.mint(owner.address, 10)).to.be.emit(contract, "Transfer");
+    });
+
+    it("Correct mint should increase balanceOf address and totalSupply", async () => {
+      const before = await contract.balanceOf(owner.address);
+      const totalSupplyBefore = await contract.totalSupply();
+      await contract.mint(owner.address, 10);
+      const after = await contract.balanceOf(owner.address);
+      const totalSupplyAfter = await contract.totalSupply();
+
+      expect(after).to.equal(before.add(10));
+      expect(totalSupplyAfter).to.equal(totalSupplyBefore.add(10));
+    });
+  });
+
+  describe("Burn", () => {
+    it("Only burner can call function", async () => {
+      expect(contract.burn(addr1.address, 10)).to.be.revertedWith("Caller is not a burner");
+    });
+
+    it("Burner from zero address shouldn't work", async () => {
+      expect(contract.burn(ethers.constants.AddressZero, 10)).to.be.revertedWith("from address can't be zero address")
+    });
+
+    it("Burn should emit Transfer event", async () => {
+      expect(contract.burn(owner.address, 10)).to.be.emit(contract, "Transfer");
+    });
+
+    it("Correct mint should increase balanceOf address", async () => {
+        const before = await contract.balanceOf(owner.address);
+        const totalSupplyBefore = await contract.totalSupply();
+        await contract.burn(owner.address, 100);
+        const totalSupplyAfter = await contract.totalSupply();
+        const after = await contract.balanceOf(owner.address);
+
+        expect(after).to.equal(before.sub(100));
+        expect(totalSupplyAfter).to.eq(totalSupplyBefore.sub(100));
     });
   });
 

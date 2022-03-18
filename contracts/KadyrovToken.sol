@@ -21,6 +21,8 @@ contract KadyrovToken is AccessControl {
 
     constructor() {
         _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
+        _setupRole(BURNER_ROLE, msg.sender);
+        _setupRole(MINTER_ROLE, msg.sender);
         _balances[msg.sender] = totalSupply;
     }
 
