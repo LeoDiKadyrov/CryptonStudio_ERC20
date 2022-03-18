@@ -2,9 +2,14 @@ import '@typechain/hardhat'
 import '@nomiclabs/hardhat-ethers'
 import '@nomiclabs/hardhat-waffle'
 import "@nomiclabs/hardhat-etherscan";
-import { task, HardhatUserConfig } from "hardhat/config";
+import { task } from "hardhat/config";
+import "hardhat-contract-sizer";
+import "hardhat-gas-reporter"
+import "solidity-coverage";
 import 'dotenv/config'
 import "./tasks/index";
+
+const { ALCHEMY_API_KEY, PRIVATE_KEY } = process.env;
 
 task("accounts", "Prints the list of accounts", async (args, hre) => {
   const accounts = await hre.ethers.getSigners();
@@ -20,8 +25,16 @@ task("accounts", "Prints the list of accounts", async (args, hre) => {
 /**
  * @type import('hardhat/config').HardhatUserConfig
  */
-const config: HardhatUserConfig = {
-  solidity: "0.8.0",
+const config = {
+  solidity: {
+    version:"0.8.0",
+    settings: {
+      optimizer: {
+        enabled: true,
+        runs: 1000000,
+      },
+    },
+  },
   etherscan : {
     apiKey: process.env.ETHERSCAN_API_KEY
   },
@@ -31,5 +44,11 @@ const config: HardhatUserConfig = {
     alwaysGenerateOverloads: false, // should overloads with full signatures like deposit(uint256) be generated always, even if there are no overloads?
     externalArtifacts: ['externalArtifacts/*.json'], // optional array of glob patterns with external artifacts to process (for example external libs from node_modules)
   },
+  networks: {
+    rinkeby: {
+      url: `https://eth-rinkeby.alchemyapi.io/v2/${ALCHEMY_API_KEY}`,
+      accounts: [`0x${PRIVATE_KEY}`],
+    },
+  }
 }
  export default config;
