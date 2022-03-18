@@ -13,3 +13,5 @@ npx hardhat node
 node scripts/sample-script.js
 npx hardhat help
 ```
+
+Rinkeby: 0x4A4fD2AF4A488eDB230d66CA18aA82c2AcB19ADc
